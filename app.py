@@ -17,18 +17,44 @@ import cv2
 
 # Download required NLTK data for TextBlob
 import nltk
+import ssl
+
+# Fix SSL certificate issues for NLTK downloads
 try:
-    nltk.data.find('tokenizers/punkt')
-except LookupError:
-    nltk.download('punkt', quiet=True)
-try:
-    nltk.data.find('taggers/averaged_perceptron_tagger')
-except LookupError:
-    nltk.download('averaged_perceptron_tagger', quiet=True)
-try:
-    nltk.data.find('corpora/brown')
-except LookupError:
-    nltk.download('brown', quiet=True)
+    _create_unverified_https_context = ssl._create_unverified_context
+except AttributeError:
+    pass
+else:
+    ssl._create_default_https_context = _create_unverified_https_context
+
+# Download all required NLTK packages
+@st.cache_resource
+def download_nltk_data():
+    packages = ['punkt', 'averaged_perceptron_tagger', 'brown', 'punkt_tab']
+    for package in packages:
+        try:
+            nltk.data.find(f'tokenizers/{package}')
+        except LookupError:
+            try:
+                nltk.download(package, quiet=True)
+            except:
+                pass
+        try:
+            nltk.data.find(f'taggers/{package}')
+        except LookupError:
+            try:
+                nltk.download(package, quiet=True)
+            except:
+                pass
+        try:
+            nltk.data.find(f'corpora/{package}')
+        except LookupError:
+            try:
+                nltk.download(package, quiet=True)
+            except:
+                pass
+
+download_nltk_data()
 
 from textblob import TextBlob
 from wordcloud import WordCloud
