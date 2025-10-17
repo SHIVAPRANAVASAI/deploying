@@ -1,6 +1,12 @@
+import os
+
+# Set environment variables FIRST, before any other imports
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+os.environ['TF_USE_LEGACY_KERAS'] = '1'  # Force Keras 2 compatibility mode
+
 import streamlit as st
 from gtts import gTTS
-import os
 import speech_recognition as sr
 from pydub import AudioSegment
 import io
@@ -9,11 +15,6 @@ from rembg import remove
 import numpy as np
 from PIL import Image
 import cv2
-
-# Suppress TensorFlow warnings for cleaner output
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
-os.environ['TF_USE_LEGACY_KERAS'] = '1'  # Force Keras 2 compatibility mode
 
 from deepface import DeepFace
 
