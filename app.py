@@ -368,22 +368,28 @@ with tab3:
         "The Amazon rainforest is home to countless species and spans across South America."
     ]
     
-    # Text input with sample button
-    col_text, col_buttons = st.columns([3, 1])
+    # Initialize session state for text
+    if 'text_content' not in st.session_state:
+        st.session_state.text_content = ""
     
-    with col_text:
-        text = st.text_area("Enter text for analysis:", 
-                           placeholder="Type or paste your text here...",
-                           height=150,
-                           key="text_input")
-    
-    with col_buttons:
+    # Buttons for random story and clear
+    col_btn1, col_btn2, col_spacer = st.columns([1, 1, 3])
+    with col_btn1:
         if st.button("🎲 Random Story"):
-            st.session_state.text_input = random.choice(sample_stories)
-            st.rerun()
+            st.session_state.text_content = random.choice(sample_stories)
+    with col_btn2:
         if st.button("🗑️ Clear Text"):
-            st.session_state.text_input = ""
-            st.rerun()
+            st.session_state.text_content = ""
+    
+    # Text input
+    text = st.text_area("Enter text for analysis:", 
+                       value=st.session_state.text_content,
+                       placeholder="Type or paste your text here...",
+                       height=150)
+    
+    # Update session state
+    if text != st.session_state.text_content:
+        st.session_state.text_content = text
     
     st.markdown("---")
     
@@ -519,3 +525,4 @@ with tab3:
 # Footer
 st.markdown("---")
 st.markdown("**🧠 AI Data Analysis** | Built with Streamlit, DeepFace, spaCy, and more!")
+
