@@ -23,23 +23,8 @@ with tab1:
     st.header("🖼️ Advanced Image Analysis")
     st.write("Upload an image for AI-powered face detection, emotion recognition, age/gender prediction, and background removal.")
 
-    # Model selection for better accuracy
-    col_settings1, col_settings2 = st.columns(2)
-    with col_settings1:
-        detector_backend = st.selectbox(
-            "Face Detection Model",
-            ["retinaface", "mtcnn", "opencv", "ssd"],
-            index=0,
-            help="RetinaFace is most accurate but slower. OpenCV is fastest but less accurate."
-        )
-    
-    with col_settings2:
-        model_name = st.selectbox(
-            "Recognition Model",
-            ["VGG-Face", "Facenet", "Facenet512", "ArcFace"],
-            index=2,
-            help="Facenet512 offers the best accuracy. VGG-Face is faster."
-        )
+    # Use OpenCV detector backend (fastest and most reliable)
+    detector_backend = "opencv"
 
     st.markdown("---")
 
