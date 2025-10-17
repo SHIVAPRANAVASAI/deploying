@@ -6,10 +6,15 @@ from pydub import AudioSegment
 import io
 
 from rembg import remove
-from deepface import DeepFace
 import numpy as np
 from PIL import Image
 import cv2
+
+# Suppress TensorFlow warnings for cleaner output
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+
+from deepface import DeepFace
 
 from textblob import TextBlob
 from wordcloud import WordCloud
