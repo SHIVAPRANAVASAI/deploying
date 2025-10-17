@@ -13,6 +13,7 @@ import cv2
 # Suppress TensorFlow warnings for cleaner output
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+os.environ['TF_USE_LEGACY_KERAS'] = '1'  # Force Keras 2 compatibility mode
 
 from deepface import DeepFace
 
