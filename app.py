@@ -15,6 +15,21 @@ import numpy as np
 from PIL import Image
 import cv2
 
+# Download required NLTK data for TextBlob
+import nltk
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    nltk.download('punkt', quiet=True)
+try:
+    nltk.data.find('taggers/averaged_perceptron_tagger')
+except LookupError:
+    nltk.download('averaged_perceptron_tagger', quiet=True)
+try:
+    nltk.data.find('corpora/brown')
+except LookupError:
+    nltk.download('brown', quiet=True)
+
 from textblob import TextBlob
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
