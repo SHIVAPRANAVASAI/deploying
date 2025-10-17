@@ -99,7 +99,7 @@ with tab1:
                             img_path=img_array,
                             actions=['age', 'gender'],
                             detector_backend=detector_backend,
-                            enforce_detection=True,
+                            enforce_detection=False,  # Faster - doesn't re-detect face
                             silent=True
                         )
                         
@@ -133,7 +133,7 @@ with tab1:
                             img_path=img_array,
                             actions=['emotion'],
                             detector_backend=detector_backend,
-                            enforce_detection=True,
+                            enforce_detection=False,  # Faster - doesn't re-detect face
                             silent=True
                         )
                         
@@ -200,7 +200,7 @@ with tab1:
                         img_path=img_array,
                         actions=['age', 'gender', 'emotion', 'race'],
                         detector_backend=detector_backend,
-                        enforce_detection=True,
+                        enforce_detection=False,  # Faster - doesn't re-detect face
                         silent=True
                     )
                     
