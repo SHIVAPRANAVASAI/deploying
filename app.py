@@ -61,6 +61,38 @@ st.plotly_chart(fig_treemap, use_container_width=True)
 
 st.markdown("---")
 
+years = sorted(df['Year'].unique())
+
+# Option to choose all years or selected year
+year_option = st.selectbox("Select Year for Top Recruiters", ["All"] + years, index=len(years))
+
+if year_option == "All":
+    df_top = df
+else:
+    df_top = df[df['Year'] == year_option]
+
+# Calculate top 10 recruiters
+top_recruiters = df_top['Name of the Employer'].value_counts().head(10).reset_index()
+top_recruiters.columns = ['Employer', 'Count']
+
+# Plotly bar chart
+fig_top = px.bar(
+    top_recruiters,
+    x='Count',
+    y='Employer',
+    color= 'Employer',
+    orientation='h',
+    title=f"Top 10 Recruiters ({year_option})",
+    text='Count'
+)
+fig_top.update_layout(yaxis={'categoryorder':'total ascending'}, height=500)
+st.plotly_chart(fig_top, use_container_width=True)
+
+
+st.markdown("---")
+
+
+
 # --- Sunburst Chart: Year -> Branch -> Employer ---
 
 fig_sunburst = px.sunburst(
@@ -85,6 +117,9 @@ st.markdown("---")
 
 
 
+st.subheader("Top 10 Recruiters")
+
+
 
 
 # Sidebar Filters
@@ -106,6 +141,9 @@ filtered_df = df[
     (df['Name of the Employer'].isin(selected_employer))
 ]
 
+
+
+
 # -----------------------------
 # Summary Cards
 # -----------------------------
@@ -119,6 +157,8 @@ col2.metric("Unique Branches", total_branches)
 col3.metric("Recruiters", total_recruiters)
 
 st.markdown("---")
+
+
 
 
 # -----------------------------
@@ -154,3 +194,6 @@ col2.plotly_chart(fig_employer, use_container_width=True)
 # --- Full data table ---
 st.subheader("Full Placement Data")
 st.dataframe(df, use_container_width=True)
+
+
+
