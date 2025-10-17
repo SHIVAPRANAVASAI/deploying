@@ -1,6 +1,9 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+from gtts import gTTS
+import os
+import whisper
 
 st.set_page_config(layout="wide")  # Full-width layout
 st.title("Placement Data Analytics Dashboard")
@@ -194,6 +197,94 @@ col2.plotly_chart(fig_employer, use_container_width=True)
 # --- Full data table ---
 st.subheader("Full Placement Data")
 st.dataframe(df, use_container_width=True)
+
+st.markdown("---")
+
+# -----------------------------
+# Text-to-Speech Feature
+# -----------------------------
+st.header("🗣️ Text to Speech")
+st.write("Convert any text to speech and listen to it instantly!")
+
+text_input = st.text_area("Enter text to convert to speech:", height=150, placeholder="Type or paste your text here...")
+
+if st.button("🎵 Convert to Audio", type="primary"):
+    if text_input.strip():
+        with st.spinner("Converting text to speech..."):
+            try:
+                tts = gTTS(text_input, lang='en')
+                audio_path = "output.mp3"
+                tts.save(audio_path)
+                
+                with open(audio_path, "rb") as audio_file:
+                    audio_bytes = audio_file.read()
+                    st.audio(audio_bytes, format='audio/mp3')
+                
+                st.success("✅ Conversion complete! Play the audio above.")
+                
+                # Clean up the file after reading
+                if os.path.exists(audio_path):
+                    os.remove(audio_path)
+            except Exception as e:
+                st.error(f"❌ Error during conversion: {str(e)}")
+    else:
+        st.warning("⚠️ Please enter some text to convert.")
+
+st.markdown("---")
+
+# -----------------------------
+# Speech-to-Text Feature
+# -----------------------------
+st.header("🎤 Speech to Text")
+st.write("Upload an audio file and convert it to text using Whisper AI!")
+
+@st.cache_resource(show_spinner=False)
+def load_whisper_model(model_name="base"):
+    """Load and cache the Whisper model"""
+    return whisper.load_model(model_name)
+
+# Load model with status indicator
+with st.spinner("Loading Whisper model..."):
+    try:
+        model = load_whisper_model("base")
+        st.success("✅ Whisper model loaded and ready!")
+    except Exception as e:
+        st.error(f"❌ Error loading Whisper model: {str(e)}")
+        model = None
+
+uploaded_audio = st.file_uploader("Upload an audio file", type=["wav", "mp3", "m4a", "flac", "ogg"], help="Supported formats: WAV, MP3, M4A, FLAC, OGG")
+
+if uploaded_audio:
+    # Save uploaded audio temporarily
+    temp_file_path = "temp_audio." + uploaded_audio.name.split(".")[-1]
+    with open(temp_file_path, "wb") as f:
+        f.write(uploaded_audio.read())
+    
+    st.audio(temp_file_path)
+    st.info(f"📁 File uploaded: {uploaded_audio.name}")
+    
+    if st.button("🎯 Transcribe Audio", type="primary"):
+        if model:
+            with st.spinner("Transcribing audio with Whisper AI..."):
+                try:
+                    result = model.transcribe(temp_file_path)
+                    
+                    st.success("✅ Transcription complete!")
+                    st.subheader("📝 Transcribed Text")
+                    st.write(result["text"])
+                    
+                    # Optional: Show detected language
+                    if "language" in result:
+                        st.info(f"🌐 Detected language: {result['language']}")
+                    
+                    # Clean up temp file
+                    if os.path.exists(temp_file_path):
+                        os.remove(temp_file_path)
+                        
+                except Exception as e:
+                    st.error(f"❌ Error during transcription: {str(e)}")
+        else:
+            st.error("❌ Whisper model not loaded. Please refresh the page.")
 
 
 
