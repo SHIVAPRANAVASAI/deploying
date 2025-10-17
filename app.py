@@ -15,6 +15,8 @@ from textblob import TextBlob
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 import random
+import spacy
+from spacy import displacy
 
 st.set_page_config(page_title="AI Data Analysis", page_icon="🧠", layout="wide")
 st.title("🧠 Unstructured Data Analysis")
@@ -432,6 +434,68 @@ with tab3:
                     col_text1.metric("Total Words", len(words))
                     col_text2.metric("Total Sentences", len(sentences))
                     col_text3.metric("Avg Words/Sentence", f"{len(words) / len(sentences) if len(sentences) > 0 else 0:.1f}")
+                    
+                    # Named Entity Recognition with spaCy
+                    st.markdown("---")
+                    st.subheader("🏷️ Named Entity Recognition (NER)")
+                    
+                    try:
+                        # Load spaCy model (cached)
+                        @st.cache_resource
+                        def load_spacy_model():
+                            return spacy.load("en_core_web_sm")
+                        
+                        nlp = load_spacy_model()
+                        doc = nlp(text)
+                        
+                        # Display entities with colors using displaCy HTML
+                        if doc.ents:
+                            html = displacy.render(doc, style="ent", jupyter=False)
+                            st.markdown("**Detected Entities:**")
+                            st.markdown(html, unsafe_allow_html=True)
+                            
+                            # Show entity table
+                            st.markdown("---")
+                            st.markdown("**Entity Details:**")
+                            entities_data = []
+                            for ent in doc.ents:
+                                entities_data.append({
+                                    "Text": ent.text,
+                                    "Type": ent.label_,
+                                    "Description": spacy.explain(ent.label_)
+                                })
+                            
+                            if entities_data:
+                                import pandas as pd
+                                entities_df = pd.DataFrame(entities_data)
+                                st.dataframe(entities_df, use_container_width=True)
+                                
+                                # Entity type distribution
+                                st.markdown("**Entity Type Distribution:**")
+                                entity_counts = {}
+                                for ent in doc.ents:
+                                    entity_counts[ent.label_] = entity_counts.get(ent.label_, 0) + 1
+                                
+                                col_ent1, col_ent2 = st.columns([2, 1])
+                                with col_ent1:
+                                    import plotly.express as px
+                                    fig = px.bar(
+                                        x=list(entity_counts.keys()),
+                                        y=list(entity_counts.values()),
+                                        labels={'x': 'Entity Type', 'y': 'Count'},
+                                        title="Entity Type Distribution"
+                                    )
+                                    st.plotly_chart(fig, use_container_width=True)
+                                
+                                with col_ent2:
+                                    for entity_type, count in entity_counts.items():
+                                        st.metric(entity_type, count)
+                        else:
+                            st.info("ℹ️ No named entities found in the text.")
+                    
+                    except Exception as e:
+                        st.warning(f"⚠️ NER analysis unavailable: {str(e)}")
+                        st.info("💡 The spaCy model may need to be downloaded. Run: `python -m spacy download en_core_web_sm`")
                     
                 except Exception as e:
                     st.error(f"❌ Analysis failed: {str(e)}")
